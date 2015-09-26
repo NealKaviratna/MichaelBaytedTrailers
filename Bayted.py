@@ -1,43 +1,37 @@
 import numpy as np
 from moviepy.editor import *
 
-# Open video file
-clip = VideoFileClip("./The.Lord.of.the.Rings.the.Fellowship.of.the.Ring.EXTENDED.2001.720p.BrRip.x264.BOKUTOX.YIFY.mp4")
+# Michael Bayte Video
+def michaelBayte(filename, clipLength, numClips):
+    # Open video file
+    clip = VideoFileClip(filename)
 
-# Get volume array from video
-print "\nGathering audio info...\n"
-cut = lambda i: clip.audio.subclip(i,i+1).to_soundarray(fps=22000)
-volume = lambda array: np.sqrt(((1.0*array)**2).mean())
-volumes = [volume(cut(i))*1000 for i in range(0,int(clip.audio.duration-2))] 
+    # Get volume array from video
+    print "\nGathering and processing audio data...\n"
+    cut = lambda i: clip.audio.subclip(i,i+1).to_soundarray(fps=22000)
+    volume = lambda array: np.sqrt(((1.0*array)**2).mean())
+    volumes = [volume(cut(i))*1000 for i in range(0,int(clip.audio.duration-2))]
 
-# Create volume segments
-print "\nProcessing audio data...\n"
-print len(volumes)
-volumeSegments = [(volumes[i*3]+volumes[i*3+1]+volumes[i*3+2], i) for i in range(len(volumes)/3)]
+    # Create volume segments
+    print "\nCreating volume segments...\n"
+    volumeSegments = [(volumes[i*clipLength]+volumes[i*clipLength+1]+volumes[i*clipLength+2], i) for i in range(len(volumes)/clipLength)]
 
-# Find five loudest segments
-print "\nSelecting Hype\n"
-maxElements = []
-for i in range(5):
-    maxElements.append(max(volumeSegments))
-    volumeSegments.remove(maxElements[i])
+    # Find loudest segments
+    print "\nSelecting Hype\n"
+    maxElements = []
+    for i in range(numClips):
+        maxElements.append(max(volumeSegments))
+        volumeSegments.remove(maxElements[i])
 
-maxElements.sort(key=lambda x: x[1])
+    maxElements.sort(key=lambda x: x[1])
 
-# Cut together video of top 5
-print "\nTrimming down video\n"
-clip1 = clip.subclip(maxElements[0][1]*3,maxElements[0][1]*3+3)
-clip2 = clip.subclip(maxElements[1][1]*3,maxElements[1][1]*3+3)
-clip3 = clip.subclip(maxElements[2][1]*3,maxElements[2][1]*3+3)
-clip4 = clip.subclip(maxElements[3][1]*3,maxElements[3][1]*3+3)
-clip5 = clip.subclip(maxElements[4][1]*3,maxElements[4][1]*3+3)
-
-video = concatenate_videoclips([clip1,clip2,clip3,clip4,clip5])
-
-# Add intro
+    # Cut together video of loudest clips
+    print "\nCutting together video\n"
+    clips = [clip.subclip(x[1]*clipLength, x[1]*clipLength+clipLength) for x in maxElements]
+    video = concatenate_videoclips(clips)
+    
+    # Write out video
+    video.write_videofile(filename + "MichaelBayted.mp4")
 
 
 
-video.write_videofile("LOTRresult.mp4")
-
-video.close()
