@@ -21,7 +21,14 @@ def michaelBayte(filename, clipLength, numClips):
     maxElements = []
     for i in range(numClips):
         maxElements.append(max(volumeSegments))
-        volumeSegments.remove(maxElements[i])
+        print maxElements[i]
+        index = volumeSegments.index(maxElements[i])
+        print "\n" + str(index)
+        
+        for j in range(index+3, index-2, -1):
+            if (j >= 0 and j < len(volumeSegments)):
+                print str(j) + " ---- " + str(index)
+                print volumeSegments.pop(j)
 
     maxElements.sort(key=lambda x: x[1])
 
