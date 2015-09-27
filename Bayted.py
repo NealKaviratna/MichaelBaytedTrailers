@@ -17,18 +17,15 @@ def michaelBayte(filename, clipLength, numClips):
     volumeSegments = [(volumes[i*clipLength]+volumes[i*clipLength+1]+volumes[i*clipLength+2], i) for i in range(len(volumes)/clipLength)]
 
     # Find loudest segments
-    print "\nSelecting Hype\n"
     maxElements = []
     for i in range(numClips):
         maxElements.append(max(volumeSegments))
-        print maxElements[i]
+        maxElements[i]
         index = volumeSegments.index(maxElements[i])
-        print "\n" + str(index)
         
         for j in range(index+3, index-2, -1):
             if (j >= 0 and j < len(volumeSegments)):
-                print str(j) + " ---- " + str(index)
-                print volumeSegments.pop(j)
+                volumeSegments.pop(j)
 
     maxElements.sort(key=lambda x: x[1])
 
@@ -38,7 +35,7 @@ def michaelBayte(filename, clipLength, numClips):
     video = concatenate_videoclips(clips)
     
     # Write out video
-    video.write_videofile(filename + "MichaelBayted.mp4")
+    video.write_videofile(filename[:-4] + "MichaelBayted.mp4")
 
 
 
